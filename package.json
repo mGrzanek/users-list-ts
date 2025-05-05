@@ -1,0 +1,17 @@
+{
+  "name": "user-ts-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "watch": "nodemon"
+  },
+  "author": "Monika",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "inquirer": "^8.2.4",
+    "nodemon": "^2.0.20",
+    "ts-node": "^8.10.2"
+  }
+}
