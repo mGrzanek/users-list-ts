@@ -4,6 +4,7 @@ const consola = require('consola');
 enum Action {
     List = "list",
     Add = "add",
+    Edit = "edit",
     Remove = "remove",
     Quit = "quit"
 }
@@ -54,9 +55,8 @@ class UsersData {
     data: User[] = [];
 
     public showAll(): void {
-        let dataInfo = null;
         Message.showColorized(consoleOption.Info, "Users data");
-        if(this.data.length > 0) dataInfo = console.table(this.data);
+        if(this.data.length > 0) console.table(this.data);
         else console.log("No data...");
     }
     public add(userObj: User): void {
@@ -65,6 +65,19 @@ class UsersData {
                 this.data.push(userObj);
                 Message.showColorized(consoleOption.Success, "User has been successfully added!");
         } else Message.showColorized(consoleOption.Error, "Wrong data!");
+    }
+    public edit(userName: string, property: "name" | "age", newValue: string | number): void {
+        const userToEdit = this.data.find(user => user.name === userName);
+        if(userToEdit) {
+            if(property === "name" && typeof newValue === "string" && newValue.length > 0){
+                userToEdit.name = newValue;
+                Message.showColorized(consoleOption.Success, "User name has been successfully edited!");
+            } else if(property === "age" && typeof newValue === "number" && newValue > 0){
+                userToEdit.age = newValue;
+                Message.showColorized(consoleOption.Success, "User age has been successfully edited!");
+            } else Message.showColorized(consoleOption.Error, "Wrong new value.");
+           
+        } else Message.showColorized(consoleOption.Error, "User not found...");
     }
     public remove(userName: string): void {
         const userToRemove = this.data.find(user => user.name === userName);
@@ -84,11 +97,12 @@ Message.showColorized(consoleOption.Info, "Available actions");
 console.log("\n");
 console.log("list – show all users");
 console.log("add – add new user to the list");
+console.log("edit – edit selected user in the list");
 console.log("remove – remove user from the list");
 console.log("quit – quit the app");
 console.log("\n");
 
-const startApp = () => {
+const startApp = (): void => {
     inquirer.prompt([{
       name: 'action',
       type: 'input',
@@ -109,6 +123,24 @@ const startApp = () => {
             message: 'Enter age',
           }]);
           users.add(user);
+          break;
+        case Action.Edit:
+          const userToEdit = await inquirer.prompt([{
+              name: 'name',
+              type: 'input',
+              message: 'Enter user name to edit',
+          }, {
+              name: 'property',
+              message: 'Select property to edit:',
+              type: 'list',
+              choices: ['name', 'age'],
+          }, {
+              name: 'newValue',
+              message: 'Enter new value',
+              type: 'input',
+          }]);
+          const newValue = userToEdit.property === 'age' ? parseInt(userToEdit.newValue) : userToEdit.newValue;
+          users.edit(userToEdit.name, userToEdit.property, newValue);
           break;
         case Action.Remove:
           const name = await inquirer.prompt([{
